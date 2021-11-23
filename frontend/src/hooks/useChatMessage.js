@@ -9,7 +9,7 @@ import useThrottle from './useThrottle';
 
 const THROTTLE_LIMIT = 50;
 const BUFFER_LIMIT = 50;
-const MESSAGE_LIMIT = 20;
+const MESSAGE_LIMIT = 100;
 
 export default function useChatMessage() {
     const { arr: messageList, set: setMessageList } = useArray([]);
@@ -30,10 +30,16 @@ export default function useChatMessage() {
 
     const onThrottle = useThrottle(updateMessage, THROTTLE_LIMIT, isBufferFull);
 
-
     const handleSocketMessage = msg => {
-        pushBuffer(msg);
-        onThrottle();
+        setMessageList(prev => {
+            let newMessageList = [...prev, msg];
+            if (newMessageList.length > MESSAGE_LIMIT) {
+                newMessageList = sliceMessage(newMessageList);
+            }
+            return newMessageList;
+        });
+        // pushBuffer(msg);
+        // onThrottle();
     };
 
     useEffect(() => {
@@ -43,5 +49,5 @@ export default function useChatMessage() {
         };
     }, []);
 
-    return { messageList };
+    return { messageList, pushBuffer, onThrottle };
 }
