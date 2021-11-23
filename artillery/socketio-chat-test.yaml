@@ -3,62 +3,65 @@
 # file, You can obtain one at http://mozilla.org/MPL/2.0/.
 
 config:
-    target: 'http://localhost:5000'
+    target: "http://localhost:5000"
     phases:
         - duration: 10
           arrivalRate: 50
     variables:
-        greeting: ['hello', 'goedemorgen', 'guten tag', 'bonjour', 'hola']
+        greeting: ["hello", "goedemorgen", "guten tag", "bonjour", "hola"]
 
 scenarios:
-    - name: 'A user that just lurks'
-      weight: 15
-      engine: 'socketio'
+    - name: "A user that just lurks"
+      weight: 10
+      engine: "socketio"
       flow:
           - emit:
-                channel: 'join'
-                data: 
-                  "channelId": "1"
-                  "auth": "viewer"
+                channel: "join"
+                data:
+                    "channelId": "1"
+                    "chatId": "1"
+                    "auth": "viewer"
           - think: 5
 
-    - name: 'A mostly quiet user'
-      weight: 75
-      engine: 'socketio'
+    - name: "A mostly quiet user"
+      weight: 80
+      engine: "socketio"
       flow:
           - emit:
-                channel: 'join'
-                data: 
-                  "channelId": "1"
-                  "auth": "viewer"
+                channel: "join"
+                data:
+                    "channelId": "1"
+                    "chatId": "1"
+                    "auth": "viewer"
           - think: 5
           - emit:
-                channel: 'chat'
-                data: 
-                  "id": "{{$randomString()}}"
-                  "type": "NORMAL"
-                  "nickname": "quiet-{{ $randomString() }}"
-                  "content": "{{ greeting }}"
+                channel: "chat"
+                data:
+                    "id": "{{$randomString()}}"
+                    "type": "NORMAL"
+                    "nickname": "quiet-{{ $randomString() }}"
+                    "content": "{{ greeting }}"
           - think: 15
 
-    - name: 'A chatty user'
+    - name: "A chatty user"
       weight: 10
-      engine: 'socketio'
+      engine: "socketio"
       flow:
           - emit:
-                channel: 'join'
-                data: 
-                  "channelId": "1"
-                  "auth": "viewer"
+                channel: "join"
+                data:
+                    "channelId": "1"
+                    "chatId": "1"
+                    "auth": "viewer"
           - think: 5
           - loop:
-              - emit:
-                    channel: 'chat'
-                    data: 
-                      "id": "{{$randomString()}}"
-                      "type": "NORMAL"
-                      "nickname": "chatty-{{ $randomString() }}"
-                      "content": "{{ greeting }}"
-              - think: 1
+                - emit:
+                      channel: "chat"
+                      data:
+                          "id": "{{$randomString()}}"
+                          "type": "NORMAL"
+                          "nickname": "chatty-{{ $randomString() }}"
+                          "content": "{{ greeting }}"
+                - think: 1
             count: 10
           - think: 15
